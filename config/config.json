@@ -1,0 +1,26 @@
+{
+   "development": {
+      "username": "codecamp",
+      "password": "codecamp17",
+      "database": "cafe_in",
+      "host": "127.0.0.1",
+      "prot": "3306",
+      "dialect": "mysql"
+   },
+   "test": {
+      "username": "codecamp",
+      "password": null,
+      "database": "database_test",
+      "host": "127.0.0.1",
+      "prot": "3306",
+      "dialect": "mysql"
+   },
+   "production": {
+      "username": "codecamp",
+      "password": null,
+      "database": "database_production",
+      "host": "127.0.0.1",
+      "prot": "3306",
+      "dialect": "mysql"
+   }
+}
