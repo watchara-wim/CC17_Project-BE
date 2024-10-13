@@ -2,7 +2,7 @@ module.exports = (sequelize, DataType) => {
    const reservations = sequelize.define(
       "Reservations",
       {
-         booking_id: {
+         reservation_id: {
             type: DataType.INTEGER,
             autoIncrement: true,
             primaryKey: true,
@@ -20,7 +20,7 @@ module.exports = (sequelize, DataType) => {
             type: DataType.INTEGER,
             allowNull: false,
          },
-         reservations_time: {
+         reservation_time: {
             type: DataType.DATE,
             allowNull: false,
          },
@@ -28,14 +28,14 @@ module.exports = (sequelize, DataType) => {
             type: DataType.INTEGER,
             allowNull: false,
          },
-         booking_detail: {
+         reservation_detail: {
             type: DataType.STRING(255),
             allowNull: true,
          },
          cancel_detail: {
             type: DataType.STRING(255),
          },
-         booking_status: {
+         reservation_status: {
             type: DataType.STRING(255),
             allowNull: false,
          },

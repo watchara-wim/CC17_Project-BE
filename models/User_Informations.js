@@ -24,7 +24,17 @@ module.exports = (sequelize, DataType) => {
          },
          email: {
             type: DataType.STRING(255),
-            allowNull: false,
+            unique: true,
+            allowNull: true,
+         },
+         new_email: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+         },
+         // NOTE - เมื่อทำการเปลี่ยน email จะต้องทำการยืนยัน email ผ่าน token ตัวนี้ทุกครั้ง (ยืนยันสำเร็จ => เอา new_email ไปแทน email)
+         verification_token: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
          },
          birth_date: {
             type: DataType.DATEONLY,

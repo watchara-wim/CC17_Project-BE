@@ -14,9 +14,25 @@ module.exports = (sequelize, DataTypes) => {
          },
          password: {
             type: DataTypes.STRING(255),
+            allowNull: false,
          },
          user_role: {
             type: DataTypes.STRING(20),
+            allowNull: false,
+         },
+         // NOTE - จะต้องยืนยัน email (ครั้งแรก) ก่อน จึงจะเปลี่ยนเป็น verified
+         is_verified: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+         },
+         // NOTE - สำหรับการ reset password
+         reset_password_token: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+         },
+         reset_password_expires: {
+            type: DataTypes.DATE,
+            allowNull: true,
          },
       },
       {
