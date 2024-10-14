@@ -15,8 +15,9 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const db = require("./models");
+const bcryptjs = require("bcryptjs");
 
-require("./config");
+require("./config/passport/passport");
 
 app.use(cors());
 

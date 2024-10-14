@@ -1,15 +1,15 @@
-module.exports = (sequelize, DataType) => {
+module.exports = (sequelize, DataTypes) => {
    const user_informations = sequelize.define(
       "User_Informations",
       {
          info_id: {
-            type: DataType.INTEGER,
+            type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
             allowNull: false,
          },
          user_id: {
-            type: DataTypeataTypes.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false,
             references: {
                model: "Users",
@@ -19,11 +19,11 @@ module.exports = (sequelize, DataType) => {
             onDelete: "CASCADE",
          },
          name: {
-            type: DataType.STRING(255),
+            type: DataTypes.STRING(255),
             allowNull: false,
          },
          email: {
-            type: DataType.STRING(255),
+            type: DataTypes.STRING(255),
             unique: true,
             allowNull: true,
          },
@@ -41,11 +41,11 @@ module.exports = (sequelize, DataType) => {
             allowNull: true,
          },
          birth_date: {
-            type: DataType.DATEONLY,
+            type: DataTypes.DATEONLY,
             allowNull: false,
          },
          point: {
-            type: DataType.INTEGER,
+            type: DataTypes.INTEGER,
          },
       },
       {

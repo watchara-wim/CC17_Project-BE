@@ -1,9 +1,9 @@
-module.exports = (sequelize, DataType) => {
+module.exports = (sequelize, DataTypes) => {
    const reservations = sequelize.define(
       "Reservations",
       {
          reservation_id: {
-            type: DataType.INTEGER,
+            type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
             allowNull: false,
@@ -17,34 +17,34 @@ module.exports = (sequelize, DataType) => {
             allowNull: true,
          },
          table_id: {
-            type: DataType.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false,
          },
          reservation_time: {
-            type: DataType.DATE,
+            type: DataTypes.DATE,
             allowNull: false,
          },
          customer_amount: {
-            type: DataType.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false,
          },
          reservation_detail: {
-            type: DataType.STRING(255),
+            type: DataTypes.STRING(255),
             allowNull: true,
          },
          cancel_detail: {
-            type: DataType.STRING(255),
+            type: DataTypes.STRING(255),
          },
          reservation_status: {
-            type: DataType.STRING(255),
+            type: DataTypes.STRING(255),
             allowNull: false,
          },
          response_at: {
-            type: DataType.DATE,
+            type: DataTypes.DATE,
             allowNull: true,
          },
          finish_at: {
-            type: DataType.DATE,
+            type: DataTypes.DATE,
          },
       },
       {

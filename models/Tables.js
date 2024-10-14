@@ -1,6 +1,6 @@
-module.exports = (sequelize, DataType) => {
+module.exports = (sequelize, DataTypes) => {
    const tables = sequelize.define(
-      "Table",
+      "Tables",
       {
          table_id: {
             type: DataTypes.INTEGER,
@@ -9,15 +9,15 @@ module.exports = (sequelize, DataType) => {
             allowNull: false,
          },
          table_number: {
-            type: DataType.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false,
          },
          capacity: {
-            type: DataType.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false,
          },
          status: {
-            type: DataType.STRING(255),
+            type: DataTypes.STRING(255),
             allowNull: false,
          },
       },
