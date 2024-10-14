@@ -2,7 +2,10 @@ const db = require("../models");
 const { Op } = require("sequelize"); // Sequelize operator
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
-const { sendVerificationEmail, sendResetEmail } = require("../utils/email");
+const {
+   sendVerificationEmail,
+   sendResetPasswordEmail,
+} = require("../utils/email");
 
 const verifyEmail = async (req, res) => {
    const { token } = req.params;
@@ -11,7 +14,7 @@ const verifyEmail = async (req, res) => {
    });
 
    if (!userInfo) {
-      return res.status(400).send("ข้อมูลไม่ถูกต้อง");
+      return res.status(400).send({ message: "ข้อมูลไม่ถูกต้อง" });
    }
 
    await db.Users.update(
@@ -32,7 +35,7 @@ const updateEmail = async (req, res) => {
    });
 
    if (!user) {
-      return res.status(400).send("ไม่พบข้อมูลผู้ใช้งาน");
+      return res.status(404).send({ message: "ไม่พบข้อมูลผู้ใช้งาน" });
    }
 
    const userInfo = await db.User_Informations.findOne({
@@ -40,11 +43,11 @@ const updateEmail = async (req, res) => {
    });
 
    if (!userInfo) {
-      return res.status(400).send("ไม่พบข้อมูลผู้ใช้งาน");
+      return res.status(404).send({ message: "ไม่พบข้อมูลผู้ใช้งาน" });
    }
 
    const verificationToken = crypto.randomBytes(32).toString("hex");
-   const tokenExpires = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // คำร้องหมดอายุใน 3 วัน
+   const tokenExpires = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
    userInfo.new_email = new_email;
    userInfo.verification_token = verificationToken;
@@ -52,7 +55,6 @@ const updateEmail = async (req, res) => {
 
    await userInfo.save();
 
-   // ส่งอีเมลยืนยันไปยังอีเมลใหม่
    sendVerificationEmail(new_email, verificationToken);
 
    return res.status(200).send({
@@ -65,7 +67,7 @@ const sendResetPassword = async (req, res) => {
    const userInfo = await db.User_Informations.findOne({ where: { email } });
 
    if (!userInfo) {
-      return res.status(400).send("ไม่พบข้อมูลในระบบ");
+      return res.status(404).send({ message: "ไม่พบข้อมูลในระบบ" });
    }
 
    const resetToken = crypto.randomBytes(32).toString("hex");
@@ -79,7 +81,7 @@ const sendResetPassword = async (req, res) => {
       { where: { user_id: userInfo.user_id } }
    );
 
-   sendResetEmail(email, resetToken);
+   sendResetPasswordEmail(email, resetToken);
 
    return res.status(200).send({
       message:
@@ -98,7 +100,7 @@ const resetPassword = async (req, res) => {
    });
 
    if (!targetUser) {
-      return res.status(400).send("ข้อมูลไม่ถูกต้อง");
+      return res.status(404).send({ message: "ไม่พบคำร้อง" });
    }
 
    const salt = bcryptjs.genSaltSync(12);
@@ -117,19 +119,21 @@ const verifyTokenExpiration = async () => {
    const currentDate = new Date();
 
    // NOTE - case เปลี่ยนที่อยู่เมล (Users.is_verified === true) >> set new_email === null
-   const usersToUpdate = await db.User_Informations.findAll({
+   const usersToUpdateEmail = await db.User_Informations.findAll({
       include: [{ model: db.Users, where: { is_verified: true } }],
       where: {
          verification_token: { [Op.ne]: null },
-         updatedAt: {
+         verification_token_expires: {
             [Op.lt]: currentDate,
          },
       }, // query verification_token ที่ไม่เท่ากับ (not equal, ne) null และ วันที่ก่อนวันนี้ (less than, lt)
    });
 
-   usersToUpdate.forEach(async (userInfo) => {
+   usersToUpdateEmail.forEach(async (userInfo) => {
       userInfo.new_email = null;
       userInfo.verification_token = null;
+      userInfo.verification_token_expires = null;
+
       await userInfo.save();
    });
 
@@ -138,7 +142,7 @@ const verifyTokenExpiration = async () => {
       include: [{ model: db.Users, where: { is_verified: false } }],
       where: {
          verification_token: { [Op.ne]: null },
-         updatedAt: {
+         verification_token_expires: {
             [Op.lt]: currentDate,
          },
       },
@@ -146,6 +150,21 @@ const verifyTokenExpiration = async () => {
 
    usersToDelete.forEach(async (userInfo) => {
       await db.Users.destroy({ where: { user_id: userInfo.user_id } });
+   });
+
+   // NOTE - case reset passwword
+   const usersToResetPassword = await db.Users.findAll({
+      where: {
+         reset_password_token: { [Op.ne]: null },
+         reset_password_expires: { [Op.lt]: currentDate },
+      },
+   });
+
+   usersToResetPassword.forEach(async (user) => {
+      user.reset_password_token = null;
+      user.reset_password_expires = null;
+
+      await user.save();
    });
 };
 

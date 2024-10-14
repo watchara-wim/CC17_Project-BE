@@ -56,7 +56,9 @@ const loginUser = async (req, res) => {
    const targetUser = await db.Users.findOne({ where: { username } });
 
    if (!targetUser) {
-      return res.status(400).send("Username หรือ password ไม่ถูกต้อง");
+      return res
+         .status(400)
+         .send({ message: "Username หรือ password ไม่ถูกต้อง" });
    }
 
    const isCorrectPassword = bcryptjs.compareSync(
@@ -65,11 +67,15 @@ const loginUser = async (req, res) => {
    );
 
    if (!isCorrectPassword) {
-      return res.status(400).send("Username หรือ password ไม่ถูกต้อง");
+      return res
+         .status(400)
+         .send({ message: "Username หรือ password ไม่ถูกต้อง" });
    }
 
    if (isCorrectPassword && !targetUser.is_verified) {
-      return res.status(403).send("กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
+      return res
+         .status(403)
+         .send({ message: "กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ" });
    }
 
    const userInfo = await db.User_Informations.findOne({
@@ -77,7 +83,7 @@ const loginUser = async (req, res) => {
    });
 
    if (!userInfo) {
-      return res.status(400).send("ไม่พบข้อมูล");
+      return res.status(404).send({ message: "ไม่พบข้อมูล" });
    }
 
    const payload = {

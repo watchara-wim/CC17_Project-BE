@@ -25,7 +25,7 @@ const sendVerificationEmail = (email, token) => {
    });
 };
 
-const sendResetEmail = (email, token) => {
+const sendResetPasswordEmail = (email, token) => {
    const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -50,4 +50,4 @@ const sendResetEmail = (email, token) => {
    });
 };
 
-module.exports = { sendVerificationEmail, sendResetEmail };
+module.exports = { sendVerificationEmail, sendResetPasswordEmail };
