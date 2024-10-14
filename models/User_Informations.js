@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataType) => {
-   const user_information = sequelize.define(
-      "User_Information",
+   const user_informations = sequelize.define(
+      "User_Informations",
       {
          info_id: {
             type: DataType.INTEGER,
@@ -36,6 +36,10 @@ module.exports = (sequelize, DataType) => {
             type: DataTypes.STRING(255),
             allowNull: true,
          },
+         verification_token_expires: {
+            type: DataTypes.DATE,
+            allowNull: true,
+         },
          birth_date: {
             type: DataType.DATEONLY,
             allowNull: false,
@@ -51,9 +55,9 @@ module.exports = (sequelize, DataType) => {
       }
    );
 
-   user_information.associate = (models) => {
-      user_information.belongsTo(models.Users, { foreignKey: "user_id" });
+   user_informations.associate = (models) => {
+      user_informations.belongsTo(models.Users, { foreignKey: "user_id" });
    };
 
-   return user_information;
+   return user_informations;
 };
