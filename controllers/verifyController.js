@@ -44,7 +44,7 @@ const updateEmail = async (req, res) => {
    }
 
    const verificationToken = crypto.randomBytes(32).toString("hex");
-   const tokenExpires = Date.now() + 3 * 24 * 60 * 60 * 1000; // คำร้องหมดอายุใน 3 วัน
+   const tokenExpires = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // คำร้องหมดอายุใน 3 วัน
 
    userInfo.new_email = new_email;
    userInfo.verification_token = verificationToken;
@@ -69,7 +69,7 @@ const sendResetPassword = async (req, res) => {
    }
 
    const resetToken = crypto.randomBytes(32).toString("hex");
-   const resetTokenExpires = Date.now() + 15 * 60 * 1000;
+   const resetTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
 
    await db.Users.update(
       {
@@ -109,7 +109,7 @@ const resetPassword = async (req, res) => {
    targetUser.reset_password_expires = null;
    await targetUser.save();
 
-   return res.status(200).send({ message: "ตั้งค่ารหัสผ่านเสร็จสิ้น" });
+   return res.status(200).send({ message: "ตั้งค่ารหัสผ่านใหม่เสร็จสิ้น" });
 };
 
 // ANCHOR - function เช็ค expired verify token >> ลบข้อมูลที่ไม่ได้ verified ทิ้ง

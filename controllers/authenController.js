@@ -36,7 +36,9 @@ const registerUser = async (req, res) => {
       email,
       birth_date,
       verification_token: verificationToken,
-      verification_token_expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      verification_token_expires: new Date(
+         Date.now() + 7 * 24 * 60 * 60 * 1000
+      ),
    });
 
    // ส่ง link ยืนยันไปที่ email ที่สมัคร
@@ -61,20 +63,29 @@ const loginUser = async (req, res) => {
       password,
       targetUser.password
    );
+
    if (!isCorrectPassword) {
       return res.status(400).send("Username หรือ password ไม่ถูกต้อง");
    }
 
    if (isCorrectPassword && !targetUser.is_verified) {
-      return res.status(403).send("Please verify your email before login.");
+      return res.status(403).send("กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
+   }
+
+   const userInfo = await db.User_Informations.findOne({
+      where: { user_id: targetUser.user_id },
+   });
+
+   if (!userInfo) {
+      return res.status(400).send("ไม่พบข้อมูล");
    }
 
    const payload = {
-      name: targetUser.name,
-      id: targetUser.id,
+      name: userInfo.name,
+      id: userInfo.info_id,
    };
    const token = jwt.sign(payload, process.env.SECRET_KEY, {
-      expiresIn: 7 * 24 * 60 * 60,
+      expiresIn: 7 * 24 * 60 * 60, // 7 วัน
    });
 
    return res.status(200).send({
