@@ -2,7 +2,7 @@ const db = require("../models");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const sendVerificationEmail = require("../utils/email");
+const { sendVerificationEmail } = require("../utils/email");
 
 // ANCHOR - Register
 const registerUser = async (req, res) => {
@@ -10,10 +10,14 @@ const registerUser = async (req, res) => {
    const targetUser = await db.Users.findOne({ where: { username } });
    const targetEmail = await db.User_Informations.findOne({ where: { email } });
 
-   if (targetUser || targetEmail) {
+   if (targetUser && targetEmail) {
       return res
          .status(400)
-         .send({ message: "Username or Email is already taken" });
+         .send({ message: "ไม่สามารถใช้ Username และ Email นี้ได้" });
+   } else if (targetUser) {
+      return res.status(400).send({ message: "Username นี้ถูกใช้ไปแล้ว" });
+   } else if (targetEmail) {
+      return res.status(400).send({ message: "Email นี้ถูกใช้ไปแล้ว" });
    }
 
    const salt = bcryptjs.genSaltSync(12);
@@ -32,14 +36,16 @@ const registerUser = async (req, res) => {
       email,
       birth_date,
       verification_token: verificationToken,
+      verification_token_expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
    });
 
    // ส่ง link ยืนยันไปที่ email ที่สมัคร
    sendVerificationEmail(email, verificationToken);
 
-   return res
-      .status(201)
-      .send({ message: "User created. Please verify your email." });
+   return res.status(201).send({
+      message:
+         "สร้างบัญชีผู้ใช้งานสำเร็จ โปรดทำการยืนยันตัวตนผ่านอีเมลที่ท่านได้ลงทะเบียนไว้ภายใน 7 วัน",
+   });
 };
 
 // ANCHOR - Login
@@ -48,7 +54,7 @@ const loginUser = async (req, res) => {
    const targetUser = await db.Users.findOne({ where: { username } });
 
    if (!targetUser) {
-      return res.status(400).send("Username or password is invalid");
+      return res.status(400).send("Username หรือ password ไม่ถูกต้อง");
    }
 
    const isCorrectPassword = bcryptjs.compareSync(
@@ -56,10 +62,10 @@ const loginUser = async (req, res) => {
       targetUser.password
    );
    if (!isCorrectPassword) {
-      return res.status(400).send("Username or password is invalid");
+      return res.status(400).send("Username หรือ password ไม่ถูกต้อง");
    }
 
-   if (!targetUser.is_verified) {
+   if (isCorrectPassword && !targetUser.is_verified) {
       return res.status(403).send("Please verify your email before login.");
    }
 
@@ -67,11 +73,13 @@ const loginUser = async (req, res) => {
       name: targetUser.name,
       id: targetUser.id,
    };
-   const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: 3600 });
+   const token = jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: 7 * 24 * 60 * 60,
+   });
 
    return res.status(200).send({
       token,
-      message: "Login successful",
+      message: "เข้าสู่ระบบสำเร็จ",
    });
 };
 

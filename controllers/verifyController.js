@@ -2,7 +2,7 @@ const db = require("../models");
 const { Op } = require("sequelize"); // Sequelize operator
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
-const sendResetEmail = require("../utils/email");
+const { sendVerificationEmail, sendResetEmail } = require("../utils/email");
 
 const verifyEmail = async (req, res) => {
    const { token } = req.params;
@@ -22,6 +22,42 @@ const verifyEmail = async (req, res) => {
    await userInfo.save();
 
    return res.status(200).send({ message: "ยืนยันอีเมลสำเร็จ" });
+};
+
+const updateEmail = async (req, res) => {
+   const { username, new_email } = req.body;
+
+   const user = await db.Users.findOne({
+      where: { username },
+   });
+
+   if (!user) {
+      return res.status(400).send("ไม่พบข้อมูลผู้ใช้งาน");
+   }
+
+   const userInfo = await db.User_Informations.findOne({
+      where: { user_id: user.user_id },
+   });
+
+   if (!userInfo) {
+      return res.status(400).send("ไม่พบข้อมูลผู้ใช้งาน");
+   }
+
+   const verificationToken = crypto.randomBytes(32).toString("hex");
+   const tokenExpires = Date.now() + 3 * 24 * 60 * 60 * 1000; // คำร้องหมดอายุใน 3 วัน
+
+   userInfo.new_email = new_email;
+   userInfo.verification_token = verificationToken;
+   userInfo.verification_token_expires = tokenExpires;
+
+   await userInfo.save();
+
+   // ส่งอีเมลยืนยันไปยังอีเมลใหม่
+   sendVerificationEmail(new_email, verificationToken);
+
+   return res.status(200).send({
+      message: "ส่งลิงก์ยืนยันไปยังอีเมลใหม่แล้ว กรุณายืนยันภายใน 3 วัน",
+   });
 };
 
 const sendResetPassword = async (req, res) => {
@@ -86,9 +122,9 @@ const verifyTokenExpiration = async () => {
       where: {
          verification_token: { [Op.ne]: null },
          updatedAt: {
-            [Op.lt]: new Date(currentDate - 3 * 24 * 60 * 60 * 1000),
+            [Op.lt]: currentDate,
          },
-      }, // query verification_token ที่ไม่เท่ากับ (not equal, ne) null และ วันที่ก่อนหน้า (less than, lt) 3 วันที่แล้ว
+      }, // query verification_token ที่ไม่เท่ากับ (not equal, ne) null และ วันที่ก่อนวันนี้ (less than, lt)
    });
 
    usersToUpdate.forEach(async (userInfo) => {
@@ -103,9 +139,7 @@ const verifyTokenExpiration = async () => {
       where: {
          verification_token: { [Op.ne]: null },
          updatedAt: {
-            [Op.lt]: new Date(
-               currentDate - 7 * 24 * 60 * 60 * 1000 // กรณีสมัครใหม่ ให้ 7 วัน
-            ),
+            [Op.lt]: currentDate,
          },
       },
    });
@@ -117,6 +151,7 @@ const verifyTokenExpiration = async () => {
 
 module.exports = {
    verifyEmail,
+   updateEmail,
    sendResetPassword,
    resetPassword,
    verifyTokenExpiration,

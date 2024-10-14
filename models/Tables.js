@@ -23,8 +23,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       {
          timestamps: true,
-         createAt: "created_at",
-         updateAt: "last_update",
+         createdAt: "created_at",
+         updatedAt: "last_update",
       }
    );
 
