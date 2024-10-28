@@ -1,19 +1,28 @@
 const nodemailer = require("nodemailer");
 
-const sendVerificationEmail = (email, token) => {
-   const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-         user: process.env.EMAIL,
-         pass: process.env.EMAIL_PASSWORD,
-      },
-   });
+const transporter = nodemailer.createTransport({
+   service: "gmail",
+   host: "smtp.gmail.com",
+   port: 465,
+   secure: true,
+   auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+   },
+});
 
+const sendVerificationEmail = (email, token) => {
    const mailOptions = {
       from: process.env.EMAIL,
       to: email,
       subject: "(Cafe In) ยืนยันอีเมล",
-      text: `โปรดคลิกที่ลิงค์ เพื่อทำการยืนยันอีเมล: ${process.env.CLIENT_URL}/verify-email/${token}`,
+      text: `โปรดคลิกที่ลิงค: ${process.env.CLIENT_URL}/verify-email/${token} เพื่อทำการยืนยันอีเมล 
+      *โปรดยืนยันอีเมลภายใน 7 วัน
+
+
+      ขอแสดงขอบคุณเป็นอย่างสูง
+      ร้านคาเฟอิน
+      `,
    };
 
    transporter.sendMail(mailOptions, (error, info) => {
@@ -26,14 +35,6 @@ const sendVerificationEmail = (email, token) => {
 };
 
 const sendResetPasswordEmail = (email, token) => {
-   const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-         user: process.env.EMAIL,
-         pass: process.env.EMAIL_PASSWORD,
-      },
-   });
-
    const mailOptions = {
       from: process.env.EMAIL,
       to: email,

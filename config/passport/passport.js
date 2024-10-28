@@ -8,9 +8,9 @@ const jwtOption = {
 };
 
 const JWTStrategy = new Strategy(jwtOption, async (payload, done) => {
-   const targetUser = await db.User.findOne({
+   const targetUser = await db.Users.findOne({
       where: {
-         id: payload.id,
+         user_id: payload.id,
       },
    });
 
