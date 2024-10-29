@@ -17,11 +17,19 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
          },
          table_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(255),
             allowNull: false,
+            defaultValue: "",
+            get() {
+               const rawValue = this.getDataValue("table_id");
+               return rawValue ? rawValue.split(",").map(Number) : [];
+            },
+            set(value) {
+               this.setDataValue("table_id", value);
+            },
          },
          reservation_time: {
-            type: DataTypes.DATE,
+            type: DataTypes.STRING(255),
             allowNull: false,
          },
          customer_amount: {

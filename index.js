@@ -17,6 +17,7 @@ const app = express();
 const userRoute = require("./routes/userRoute");
 const emailRoute = require("./routes/emailRoute");
 const tableRoute = require("./routes/tableRoute");
+const reservationRoute = require("./routes/reservationRoute");
 const cors = require("cors");
 const db = require("./models");
 const { table } = require("console");
@@ -31,6 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/user", userRoute);
 app.use("/verification", emailRoute);
 app.use("/table", tableRoute);
+app.use("/reservation", reservationRoute);
 
 db.sequelize
    .sync({ force: true })
@@ -50,11 +52,24 @@ db.sequelize
             },
             {
                user_id: 2,
-               username: "user",
+               username: "user1",
                password: bcryptjs.hashSync("user123", 12),
                user_role: process.env.ROLE_MEMBER,
                is_verified: true,
-               reset_password_token: crypto.randomBytes(32).toString("hex"),
+            },
+            {
+               user_id: 3,
+               username: "user2",
+               password: bcryptjs.hashSync("user123", 12),
+               user_role: process.env.ROLE_MEMBER,
+               is_verified: true,
+            },
+            {
+               user_id: 4,
+               username: "user3",
+               password: bcryptjs.hashSync("user123", 12),
+               user_role: process.env.ROLE_MEMBER,
+               is_verified: true,
             },
          ]);
       }
@@ -74,13 +89,66 @@ db.sequelize
             {
                info_id: 2,
                user_id: 2,
-               name: "ผู้ใช้งาน",
-               email: process.env.USER_EMAIL,
-               new_email: process.env.USER_EMAIL,
+               name: "ผู้ใช้งาน1",
+               email: "-",
+               tel: "012-345-6789",
+               birth_date: Date.now(),
+            },
+            {
+               info_id: 3,
+               user_id: 3,
+               name: "ผู้ใช้งาน2",
+               email: "--",
+               tel: "012-345-6789",
+               birth_date: Date.now(),
+            },
+            {
+               info_id: 4,
+               user_id: 4,
+               name: "ผู้ใช้งาน3",
+               email: "---",
                tel: "012-345-6789",
                birth_date: Date.now(),
             },
          ]);
+
+         const reservationRecord = await db.Reservations.findAll();
+
+         if (reservationRecord.length === 0) {
+            await db.Reservations.bulkCreate([
+               {
+                  reservation_id: 1,
+                  customer_id: 2,
+                  table_id: "1,2",
+                  create_at: Date.now(),
+                  reservation_time: "17:00",
+                  customer_amount: 7,
+                  reservation_status: "pending",
+               },
+               {
+                  reservation_id: 2,
+                  customer_id: 3,
+                  staff_id: 1,
+                  table_id: "6",
+                  create_at: Date.now(),
+                  reservation_time: "17:00",
+                  customer_amount: 3,
+                  reservation_status: "accepted",
+                  response_at: Date.now(),
+               },
+               {
+                  reservation_id: 3,
+                  customer_id: 4,
+                  staff_id: 1,
+                  table_id: "12",
+                  create_at: Date.now(),
+                  reservation_time: "17:00",
+                  customer_amount: 3,
+                  reservation_status: "arrive",
+                  response_at: Date.now(),
+               },
+            ]);
+         }
 
          const tableRecord = await db.Tables.findAll();
 
@@ -90,13 +158,23 @@ db.sequelize
                   table_id: 1,
                   table_number: "1",
                   capacity: 6,
-                  status: "empty",
+                  status: "onHold",
                },
-               { table_id: 2, table_number: "2", capacity: 6, status: "empty" },
+               {
+                  table_id: 2,
+                  table_number: "2",
+                  capacity: 6,
+                  status: "onHold",
+               },
                { table_id: 3, table_number: "3", capacity: 6, status: "empty" },
                { table_id: 4, table_number: "4", capacity: 4, status: "empty" },
                { table_id: 5, table_number: "5", capacity: 4, status: "empty" },
-               { table_id: 6, table_number: "6", capacity: 4, status: "empty" },
+               {
+                  table_id: 6,
+                  table_number: "6",
+                  capacity: 4,
+                  status: "reserved",
+               },
                { table_id: 7, table_number: "7", capacity: 4, status: "empty" },
                { table_id: 8, table_number: "8", capacity: 4, status: "empty" },
                { table_id: 9, table_number: "9", capacity: 4, status: "empty" },
@@ -116,7 +194,7 @@ db.sequelize
                   table_id: 12,
                   table_number: "12",
                   capacity: 4,
-                  status: "empty",
+                  status: "full",
                },
                {
                   table_id: 13,
