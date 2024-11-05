@@ -1,10 +1,10 @@
 {
    "development": {
-      "username": "codecamp",
-      "password": "codecamp17",
+      "username": "root",
+      "password": "bas309497",
       "database": "cafe_in",
       "host": "127.0.0.1",
-      "prot": "3306",
+      "port": "3306",
       "dialect": "mysql"
    },
    "test": {

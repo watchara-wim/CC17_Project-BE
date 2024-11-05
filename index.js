@@ -118,8 +118,9 @@ db.sequelize
             await db.Reservations.bulkCreate([
                {
                   reservation_id: 1,
-                  customer_id: 2,
+                  customer_id: 3,
                   table_id: "1,2",
+                  capacity: 16,
                   create_at: Date.now(),
                   reservation_time: "17:00",
                   customer_amount: 7,
@@ -130,6 +131,7 @@ db.sequelize
                   customer_id: 3,
                   staff_id: 1,
                   table_id: "6",
+                  capacity: 8,
                   create_at: Date.now(),
                   reservation_time: "17:00",
                   customer_amount: 3,
@@ -141,6 +143,7 @@ db.sequelize
                   customer_id: 4,
                   staff_id: 1,
                   table_id: "12",
+                  capacity: 4,
                   create_at: Date.now(),
                   reservation_time: "17:00",
                   customer_amount: 3,

@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
                this.setDataValue("table_id", value);
             },
          },
+         capacity: { type: DataTypes.INTEGER, allowNull: false },
          reservation_time: {
             type: DataTypes.STRING(255),
             allowNull: false,

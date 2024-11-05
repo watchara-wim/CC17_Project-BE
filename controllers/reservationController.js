@@ -67,7 +67,10 @@ const getReservationById = async (req, res) => {
          where: { reservation_id: id },
       });
 
-      if (!reservation) {
+      if (
+         !reservation ||
+         ["finish", "cancel"].includes(reservation.reservation_status)
+      ) {
          return res.status(404).send({ message: "ไม่พบรายการจองดังกล่าว" });
       }
 
@@ -76,7 +79,7 @@ const getReservationById = async (req, res) => {
       if (tableIds.length === 0) {
       }
 
-      return res.status(200).send(reservation);
+      return res.status(200).send({ reservation });
    } catch (error) {
       console.error(error);
       return res.status(500).send({ message: "เกิดความผิดพลาดของเซิร์ฟเวอร์" });
