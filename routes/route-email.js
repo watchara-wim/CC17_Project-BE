@@ -1,5 +1,5 @@
 const express = require("express");
-const verifyController = require("../controllers/verifyController");
+const verifyController = require("../controllers/controller-verification");
 const router = express.Router();
 
 router.get("/verify-email/:token", verifyController.verifyEmail);

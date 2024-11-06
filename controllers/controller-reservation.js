@@ -120,11 +120,11 @@ const createReservation = async (req, res) => {
          return res.status(400).send({ message: "รูปแบบข้อมูลไม่ถูกต้อง" });
       }
 
-      const tableId = table_id.join(",");
+      // const tableId = table_id.join(",");
 
       const newReservation = await db.Reservations.create({
          customer_id,
-         table_id: tableId,
+         table_id, // ลบ tableId ออก
          capacity,
          reservation_time,
          customer_amount,
@@ -169,9 +169,6 @@ const updateReservation = async (req, res) => {
             break;
          case "arrive":
             updatedTableStatus = "full";
-            break;
-         case "finish":
-            updatedTableStatus = "empty";
             break;
          case "cancel":
             updatedTableStatus = "empty";
@@ -219,6 +216,17 @@ const updateReservation = async (req, res) => {
          });
 
          table.update({ status: updatedTableStatus });
+      }
+
+      if (reservation_status === "arrive") {
+         await db.Orders.create({
+            reservation_id: reservation.id,
+            staff_id,
+            table_id: reservation.table_id,
+            customer_id: reservation.customer_id,
+            net_price: 0,
+            order_status: "pending",
+         });
       }
 
       return res.status(200).send({ reservation });

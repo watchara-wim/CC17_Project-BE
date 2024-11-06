@@ -25,7 +25,10 @@ module.exports = (sequelize, DataTypes) => {
                return rawValue ? rawValue.split(",").map(Number) : [];
             },
             set(value) {
-               this.setDataValue("table_id", value);
+               this.setDataValue(
+                  "table_id",
+                  Array.isArray(value) ? value.join(",") : value
+               );
             },
          },
          capacity: { type: DataTypes.INTEGER, allowNull: false },
@@ -77,8 +80,10 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       reservations.belongsToMany(models.Tables, {
-         through: models.Has,
+         through: models.TablesReservation,
       });
+
+      reservations.hasOne(models.Orders, { foreignKey: "reservation_id" });
    };
 
    return reservations;

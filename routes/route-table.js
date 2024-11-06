@@ -1,5 +1,5 @@
 const express = require("express");
-const tableController = require("../controllers/tableController");
+const tableController = require("../controllers/controller-table");
 const router = express.Router();
 // const passport = require("passport");
 

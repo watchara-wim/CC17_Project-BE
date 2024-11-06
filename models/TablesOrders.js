@@ -1,5 +1,5 @@
 module.exports = (sequelize) => {
-   const has = sequelize.define("Has", {});
+   const has = sequelize.define("TablesOrders", {});
 
    return has;
 };

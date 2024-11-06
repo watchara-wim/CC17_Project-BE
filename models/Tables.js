@@ -29,7 +29,13 @@ module.exports = (sequelize, DataTypes) => {
    );
 
    tables.associate = (models) => {
-      tables.belongsToMany(models.Reservations, { through: models.Has });
+      tables.belongsToMany(models.Reservations, {
+         through: models.TablesReservation,
+      });
+
+      tables.belongsToMany(models.Orders, {
+         through: models.TablesOrders,
+      });
    };
 
    return tables;
